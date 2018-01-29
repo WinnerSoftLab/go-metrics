@@ -25,6 +25,7 @@ type Timer interface {
 	Update(time.Duration)
 	UpdateSince(time.Time)
 	Variance() float64
+	Clear()
 }
 
 // GetOrRegisterTimer returns an existing Timer or constructs and registers a
@@ -136,6 +137,9 @@ func (NilTimer) UpdateSince(time.Time) {}
 
 // Variance is a no-op.
 func (NilTimer) Variance() float64 { return 0.0 }
+
+// Count is a no-op.
+func (NilTimer) Clear() {}
 
 // StandardTimer is the standard implementation of a Timer and uses a Histogram
 // and Meter.
@@ -249,6 +253,11 @@ func (t *StandardTimer) Variance() float64 {
 	return t.histogram.Variance()
 }
 
+// Clear data
+func (t *StandardTimer) Clear() {
+	t.histogram.Clear()
+}
+
 // TimerSnapshot is a read-only copy of another Timer.
 type TimerSnapshot struct {
 	histogram *HistogramSnapshot
@@ -308,6 +317,9 @@ func (t *TimerSnapshot) Stop() {}
 
 // Sum returns the sum at the time the snapshot was taken.
 func (t *TimerSnapshot) Sum() int64 { return t.histogram.Sum() }
+
+// Clear is a no-op.
+func (t *TimerSnapshot) Clear() {}
 
 // Time panics.
 func (*TimerSnapshot) Time(func()) {
