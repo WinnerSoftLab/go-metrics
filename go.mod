@@ -1,4 +1,4 @@
-module go-metrics
+module github.com/WinnerSoftLab/go-metrics
 
 go 1.13
 
