@@ -165,8 +165,8 @@ func (m *StandardMeter) Count() int64 {
 // Mark records the occurance of n events.
 func (m *StandardMeter) Mark(n int64) {
 	m.lock.Lock()
-	defer m.lock.Unlock()
 	if m.stopped {
+		m.lock.Unlock()
 		return
 	}
 	m.snapshot.count += n
@@ -174,6 +174,7 @@ func (m *StandardMeter) Mark(n int64) {
 	m.a5.Update(n)
 	m.a15.Update(n)
 	m.updateSnapshot()
+	m.lock.Unlock()
 }
 
 // Rate1 returns the one-minute moving average rate of events per second.
@@ -227,11 +228,11 @@ func (m *StandardMeter) updateSnapshot() {
 
 func (m *StandardMeter) tick() {
 	m.lock.Lock()
-	defer m.lock.Unlock()
 	m.a1.Tick()
 	m.a5.Tick()
 	m.a15.Tick()
 	m.updateSnapshot()
+	m.lock.Unlock()
 }
 
 // meterArbiter ticks meters every 5s from a single goroutine.
@@ -257,8 +258,8 @@ func (ma *meterArbiter) tick() {
 
 func (ma *meterArbiter) tickMeters() {
 	ma.RLock()
-	defer ma.RUnlock()
 	for meter := range ma.meters {
 		meter.tick()
 	}
+	ma.RUnlock()
 }
