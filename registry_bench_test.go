@@ -3,9 +3,10 @@ package metrics_test
 import (
 	"crypto/md5"
 	"fmt"
-	"go-metrics"
 	"testing"
 	"time"
+
+	"github.com/WinnerSoftLab/go-metrics"
 )
 
 func BenchmarkGetOrRegisterCounter(b *testing.B) {
